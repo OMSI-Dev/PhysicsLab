@@ -9,7 +9,7 @@
 //   Pin 21 -> BCK  (bit clock)
 //   3.3V   -> VCC
 //   GND    -> GND
-// Verified shield fits Teensy 4.0 [2026-09-22 by autumn]
+// Verified shield fits Teensy 4.0 footprint + pinouts [2026-09-22 by autumn]
 
 AudioSynthWaveformSine sine1;
 AudioOutputPT8211      dac;
