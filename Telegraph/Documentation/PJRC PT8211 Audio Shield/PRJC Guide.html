@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>PJRC Store</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="/favicon.ico">
+<style>
+body,td,p {font-family: Arial, Helvetica, sans-serif;}
+html { scroll-behavior: smooth; }
+img { max-width:100%; height:auto; }
+nav.left { float:left; width:172px; }
+.logoimg { display:block; padding-left:40px; }
+.notmobile {/* display:normal */}
+.navtopwidth { width=100%; max-width:calc(185px + 1080px); }
+.headertop { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2px }
+.navtop { display:flex; justify-content:space-around; background-color:#D0E0FF; }
+.navtopitem { padding:6px; }
+.navbreadcrumb { background-color:#F0F0F0; }
+main { float:left; margin-left:10px; width:calc(100% - 185px); max-width:1080px; }
+aside { float:right; }
+figure { display:table; }
+figcaption { display:table-caption; caption-side:bottom; font-size:0.8em; font-weight:bold; }
+@media only screen and (max-width:960px) {
+	aside { float:none; display:table; margin:auto; }
+}
+@media only screen and (max-width:600px) {
+	nav.left { display:none; }
+	.notmobile { display:none; }
+	.logoimg { padding-left:6px; }
+	main { width:100%; margin-left:0; }
+	table { font-size:75%; }
+}
+.center { margin: auto; }
+h1 {font-size: 200% }
+h2 {font-size: 160% }
+h3 {font-size: 140% }
+h4 {font-size: 120% }
+h5 {font-size: 110% }
+dl.featurelist dt {
+	font-weight: bold;
+	font-size: 130%;
+	margin-left: 2em;
+	display: list-item;
+	list-style-type: disc;
+}
+dl.featurelist dd {
+	margin-left: 4em;
+	padding-bottom: 0.75em;
+}
+ul.subfeaturelist {
+	padding-top: 0.4em;
+}
+ul.subfeaturelist li {
+	font-size: 90%;
+	padding-bottom: 0.25em;
+}
+.orderButton {
+	background:linear-gradient(to bottom, #c5f7be 5%, #cae0b3 100%);
+	background-color:#c5f7be;
+	border-radius:6px;
+	cursor:pointer;
+	padding:8px 20px;
+}
+.orderButton:hover {
+	background:linear-gradient(to bottom, #cae0b3 5%, #c5f7be 100%);
+	background-color:#cae0b3;
+}
+.orderButton:active {
+	position:relative;
+	top:1px;
+}
+tr.top {background-color:#C0C0C0}
+tr.odd {background-color:#F0F0F0}
+tr.even {background-color:#E0E0E0}
+p.desc {padding-left:3em; margin:0px; padding-top:0.2em; padding-bottom:0.8em; font-size:0.75em}
+span.literal {color: #006666}
+span.comment {color: #777755}
+span.keyword {color: #cc6600}
+span.function {color: #996600}
+span.mainfunction {color: #993300; font-weight: bolder}
+span.footnote {vertical-align: super; font-size: smaller; color: #ff0000;}
+a.footnote:link {text-decoration: none}
+a.footnote:visited {text-decoration: none}
+</style>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000D0" vlink="#202080">
+
+<!--nav begin-->
+<header class="headertop navtopwidth">
+<div><a href="/"><img src="/img/logo.gif" alt="PJRC" width=276 height=31 class=logoimg></a></div>
+<div>
+<small>
+<a href="https://www.pjrc.com/cart/cart.php">Shopping&nbsp;Cart</a>
+<span class=notmobile><img src="/img/a.gif" width=10 height=10 alt="">
+<a href="/cgi-bin/archive/summary">Download&nbsp;Website</a></span>
+</small>
+</div>
+</header>
+<nav class="navtop navtopwidth">
+<div class=navtopitem><a href="/">Home</a></div>
+<div class=navtopitem>Products</div>
+<div class=navtopitem><a href="/teensy/">Teensy</a></div>
+<div class=navtopitem><a href="/blog/">Blog</a></div>
+<div class=navtopitem><a href="https://forum.pjrc.com/">Forum</a></div>
+</nav>
+<nav class="navbreadcrumb navtopwidth">
+<small><span class=notmobile>You are here:</span>
+<a href="/store/">PJRC Store</a>
+<img src="/img/b.gif" width=10 height=10 alt="">
+<a href="teensy41.html">Teensy 32 bit</a>
+<img src="/img/b.gif" width=10 height=10 alt="">
+<span style="background-color: #B0E4A8">PT8211 Audio Kit</span>
+</small></nav>
+<p>
+<nav class=left>
+<table width=172 border=0 cellspacing=0 cellpadding=6>
+<tr><td height=15></td></tr>
+<tr><td bgcolor="#D0E0FF" align=center>
+<big><b>PJRC Store</b></big>
+</td></tr>
+<tr><td bgcolor="#F0F0F0" style="line-height: 96%">
+<small>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="index.html">Full Product List</a><br>
+<img src="/img/b.gif" width=10 height=10 alt="">
+<b>Teensy 32 bit</b><br>
+</small>
+<div style="padding-left: 1.2em">
+<small>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="teensy41.html">Teensy 4.1</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="teensy41_pins.html">Teensy 4.1 Pins</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="teensy40.html">Teensy 4.0</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="teensy40_pins.html">Teensy 4.0 Pins</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="display_ili9341_touch.html">Color Touchscreen</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="header_14x1.html">Pins 14x1</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="header_24x1.html">Pins 24x1</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="socket_14x1.html">Socket 14x1</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="socket_24x1.html">Socket 24x1</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="cable_usb_host_t36.html">USB Host Cable</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="teensy3_audio.html">Audio Adaptor</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="microphone.html">Microphone</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="audio_tutorial_kit.html">Audio Tutorial</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="audio_tutorial_diy_parts.html">Audio Tutorial Parts</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="audio_ground_isolator.html">Audio Ground Isolator</a><br>
+<img src="/img/b.gif" width=10 height=10 alt="selected">
+<span style="background-color: #B0E4A8">PT8211 Audio Kit</span><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="ethernet_kit.html">Ethernet Kit</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="header_socket_3x2.html">Pins+Socket 3x2</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="octo28_adaptor.html">OctoWS2811 Adaptor</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="ic_mkl02_t4.html">MKL02 T4.x Chip</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="psram.html">PSRAM Chip</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="tutorial_kit.html">Tutorial Kit</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="led_rgb.html">RGB LED</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="pot_thumb_25k.html">Pot, 25K</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="header_14x1_d.html">Pins 14x1-D</a><br>
+</small>
+</div>
+<small>
+<a href="teensy32.html"><img src="/img/c.gif" width=10 height=10 alt="" border=0>
+<b>Teensy 3.x (legacy)</b></a><br>
+<a href="teensy.html"><img src="/img/c.gif" width=10 height=10 alt="" border=0>
+<b>Teensy 8 bit</b></a><br>
+<a href="mp3_display.html"><img src="/img/c.gif" width=10 height=10 alt="" border=0>
+<b>MP3 Player</b></a><br>
+<a href="dev_pcb_assem.html"><img src="/img/c.gif" width=10 height=10 alt="" border=0>
+<b>8051 Dev Board</b></a><br>
+<a href="leftover_stuff_sale.html"><img src="/img/c.gif" width=10 height=10 alt="" border=0>
+<b>Discontinued</b></a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="payment.html">Payment Options</a><br>
+<img src="/img/a.gif" width=10 height=10 alt="">
+<a href="privacy.html">Privacy Policy</a><br>
+</small></td></tr>
+<tr><td height=60></td></tr>
+</table><br>
+<a name="navend"> </a>
+</nav>
+<!--nav end-->
+
+
+<main>
+<h1>PT8211 Audio Kit for Teensy 3.x</h1>
+
+SparkFun is now manufacturing Teensy products.  You can buy directly at SparkFun.
+<p>
+<table border cellspacing=0 cellpadding=6><tr>
+<td>
+<a href="https://www.sparkfun.com/teensy-pt8211-audio-kit.html"><img src="sparkfun-cta-225.png" width=225 height=70></a>
+</td>
+<td>PT8211_AUDIO_KIT</td>
+<td>PT8211 Audio Kit for Teensy 3.x and Teensy 4.x</td>
+</tr></table>
+
+<p>
+<a href="pt8211.pdf">PT8211</a> is a 16 bit stereo digital to analog converter (DAC) chip.
+The output is a line-level signal meant for amplified speakers, stereo receiver, mixer
+or amplifier.  It is not meant to directly drive headphones or speakers.
+<p>
+This kit includes the PT8211 chip, bare circuit board, audio connector, 1 resistor
+and 4 capacitors.  DIY soldering is required.
+<p>
+<center><img src="pt8211_01.jpg"></center>
+<p>
+<a href="teensy32.html">Teensy 3.2</a>,
+<a href="teensy35.html">Teensy 3.5</a>,
+<a href="teensy36.html">Teensy 3.6</a>,
+<a href="header_14x1.html">pins</a>,
+<a href="header_14x1_d.html">double insulator pins</a>, and
+<a href="socket_14x1.html">sockets</a>
+are sold separately.  This kit is
+not compatible with Teensy 2.0, Teensy++ 2.0 or Teensy LC.
+<p>
+<b>Update:</b> We are now including 2 circuit boards with this PT8211 kit.
+This new board brings the 3 signals to pins 7, 20, 21 used by Teensy 4.0.
+If you are using Teensy 3.2, 3.5 or 3.6, solder the parts to the original
+board, without text between the capacitors.  If using Teensy 4.0, solder
+with this new board which has "T4" printed between the capacitors.
+<br>
+<img src="pt8211_t4_pcb.jpg">
+
+
+
+<h2>Assembling The PT8211 Kit</h2>
+<p>
+The first part to solder is the PT8211 chip.  Apply a small amount of solder to 1
+of the surface mount pads.  Then using tweezers or needle-nose pliers, carefully
+align the PT8211 chip and heat the solder to "tack" it into place.  Be careful to
+orient the chip correctly, matching the pin #1 dot on the chip with the dot
+printed on the circuit board.
+<p>
+<center><img src="pt8211_02.jpg"></center>
+<p>
+With the PT8211 tacked into place, carefully solder all 8 pins.  This is the most
+challenging part to soldering.  A magnifier and bright light are highly recommended.
+<p>
+<center><img src="pt8211_03.jpg"></center>
+<p>
+The 10 ohm resistor is next.  Bend the leads and push it through the board.  The
+resistor can be placed in either direction.
+<p>
+<center><img src="pt8211_04.jpg"></center>
+<p>
+Then solder the 0.1 &micro;F capacitor.  Like the resistor, this part is not
+directional.
+<p>
+<center><img src="pt8211_05.jpg"></center>
+<p>
+Solder the audio connector next.  The board will tip at an angle, because this part
+is much taller.  Solder one of the pins, then visually check the connector is aligned
+flush with the board.  After you solder more than 1 pin, it's almost impossible to
+straighten.  Finish soldering the rest of its pins once the fit is good.
+<p>
+<center><img src="pt8211_06.jpg"></center>
+<p>
+The three 47 &micro;F capacitors are the last parts to solder.  These are directional.
+Align the side with the negative marking towards the audio connector.  The circuit board
+also has polarity markings to help.
+<p>
+<center><img src="pt8211_07.jpg"></center>
+<p>
+After all the parts are soldered, it's time to decide how your PT8211 board will
+connect with Teensy.  In these photos,
+<a href="header_14x1.html">ordinary pins</a> were soldered to the PT8211 board.
+You could choose to instead solder <a href="socket_14x1.html">sockets</a> to the
+PT8211, or use the <a href="header_14x1_d.html">double insulator pins</a> to
+permanently join the two boards together.
+<p>
+While soldering, use a breadboard or another already-soldered board to slight
+the pins or sockets properly.  After soldering, adjusting the direction is
+almost impossible.
+<p>
+<center><img src="pt8211_08.jpg"></center>
+<p>
+Then join your assembled PT8211 shield to your Teensy 3.2, 3.5 or 3.6.  The
+audio connector is placed above Teensy's USB connector.  The PT8211 covers
+22 of the 28 pins on Teensy 3.2, or 22 of the 48 pins on Teensy 3.5 &amp; 3.6.
+<p>
+<center><img src="pt8211_09.jpg"></center>
+<p>
+We do not recommend wires between Teensy and the PT8211.  If wires are used,
+they should be kept short, especially ground.  Teensy uses 4X oversampling
+on the stereo 44.1 kHz 16 bit data, so the data rate is very high.  Lengthy
+wires between these boards are likely to cause trouble.
+<p>
+The completed assembly should look liks this:
+<p>
+<center><img src="pt8211_10.jpg"></center>
+<p>
+<h2>Using PT8211 From The Audio Design Tool</h2>
+<p>
+Most audio library examples and the
+<a href="audio_tutorial_kit.html">audio library tutorial</a>
+use the I2S object to send to the
+<a href="teensy3_audio.html">Audio Shield</a>.  For example,
+here is the design from Part 2-2 of the tutorial.
+<p>
+<center><img src="pt8211_11.png"></center>
+<p>
+To convert this to PT8211, just delete the i2s1 output object and
+put a pt8211_1 object in its place.  Redraw the 2 connections.
+Also delete the sgtl5000_1 object, since the PT8211 chip has no
+special control object.
+<p>
+<center><img src="pt8211_12.png"></center>
+<p>
+If you have code using the sgtl5000_1 object, just delete those
+lines.  The PT8211 has no special adjustments like volume.  It
+simply converts digital data to analog signals.
+
+
+<h2>Modifying Existing Code For PT8211</h2>
+
+You can also easily convert existing code to use PT8211.  Look for
+<span style="color: #CC6600;">AudioOutputI2S</span>.
+<p>
+<center><img src="pt8211_13.png"></center>
+<p>
+Simply change <span style="color: #CC6600;">AudioOutputI2S</span>
+to <span style="color: #CC6600;">AudioOutputPT8211</span>.  Also delete
+any <span style="color: #CC6600;">AudioControlSGTL5000</span> object.
+<p>
+<center><img src="pt8211_14.png"></center>
+<p>
+Programs originally writting to use <span style="color: #CC6600;">AudioControlSGTL5000</span>
+will have lines you need to delete or comment out.  In this case, the
+sgtl5000_1.enable() and sgtl5000_1.volume(0.5) are removed.
+<p>
+<center><img src="pt8211_15.png"></center>
+<p>
+<p>
+
+<h2>Using PT8211 Without Audio Library</h2>
+
+PT8211 is a simple DAC which can be used just sending a pair of 16 bit numbers.
+PT8211 does not contain oversampling noise shaping filters or other complex
+signal processing which would require steady sample rate.  It is possible to
+<a href="https://forum.pjrc.com/threads/72446">use as a simple DAC</a>.
+<p>
+The output voltage spans approximately 1.6 volts, centered between GND and 3.3V
+power.  For DC coupled applications where you want numerical input 0 to give
+0 volts DC, you will need an opamp circuit to shift the signal to ground.
+Calibration of the offset voltage with a trim pot or numerical adjustment 
+in software may be needed.
+
+<h2>Technical Details</h2>
+<p>
+<a href="pt8211.pdf">PT8211 Datasheet</a>.
+<p>
+<pre>
+Signal     Teensy 3.x   Teensy 4.x   PT8211 Pin
+------     ----------   ----------   ----------
+ BCK            9           21           1
+ DIN           22            7           3
+ WS            23           20           2
+ +3.3V       3.3V         3.3V           5
+ GND          GND          GND           4
+
+</pre>
+<p>
+<h3>Teensy 3 Version</h3>
+
+<img src="pt8211_16.png">
+<p>
+<img src="schematic_pt8211_t3.png">
+<p>
+
+<h3>Teensy 4 Version</h3>
+
+<img src="pt8211_17.png">
+<p>
+<img src="schematic_pt8211_t4.png">
+<p>
+
+
+
+More details about the PCB are at this <a href="https://www.oshpark.com/shared_projects/TyqlhCdw">OSH Park page</a>.
+<p>
+
+</main>
+</body>
+</html>
