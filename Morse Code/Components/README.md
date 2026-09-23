@@ -1,10 +1,31 @@
-# Telegraph for Physics Lab
-
+# Telegraph station for Physics Lab
 
 ## Summary of interactives
-The `morse code` project emulates an analog system with a digital system. A `PT8211` audio shield [from PJRC](https://www.pjrc.com/store/pt8211_kit.html) is mounted on a `Teensy 4.0`, hosted on a custom circuit board. 
+The `morse code` project emulates an analog system with a digital system. 
+
+Two identical telegraph stations are present; two circuit boards, firmware copies, speaker systems, LED domes, etc. 
+ 
+
+## Objectives of interactives
+Two stations will each host a telegraph input. A station will trigger its' opposing station's output components: an LED dome and speaker. 
+
+The LED dome will output high-resolution fades to emulate an old incadescent light bulb. 
+
+1. Read inbound short & long analog signals from the opposing button
+2. Output short & long sine-wave audio to the `PT8211`, depending on the received input
+3. Output short & long visual pulses on the LED dome, depending on the recieved input
+
+
+## LED domes
+LED domes are internally illuminated by the module [Z-G4-9WW](https://www.digikey.com/en/products/detail/jkl-components-corp/Z-G4-9WW/22677423), G-4 TWO-PIN 12V-24VDC WARM. 
+
+An onboard N-channel mosfet drives the LED's PWM pulses, controlled by Pin 3 on the `Teensy 4.0` controller. 
+
+# Hardware Assembly
 
 ## PT8211 and the Teensy 4.0
+A `PT8211` audio shield [from PJRC](https://www.pjrc.com/store/pt8211_kit.html) is mounted on a `Teensy 4.0`, hosted on a custom circuit board.
+
 PRJC's original `PT8211` shield design is for the `Teensy 3.x` footprint. The `Teensy 4.0` is used in this project to fit this requirement. 
 
 Physical modifications are needed if a `Teensy 4.1` board is used. 
@@ -13,11 +34,6 @@ Physical modifications are needed if a `Teensy 4.1` board is used.
 PRJC's `PT8211 T4` variation is used for  `morse code`. 
 
 Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure the `T4` variation is used. 
-
-## Objectives of interactives
-
-1. Read short & long analog pulses from two opposing buttons
-2. Output high-resolution PWM fades to two opposing LEDs, emulating old incandescent light-bulbs
 
 ## Summary of components
 1. Custom circuit board with parts:
@@ -46,9 +62,6 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
     c) (J1) terminal for button input/output line
         - (J2) JST connection 
         - (J3) JST connection
-    c) 
-    d) 
-    e) 
         
 ```
     
@@ -64,26 +77,9 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
     a) 2x buttons
     b) 2x LED WS2812(?) fixtures
 ```
-    
-
-## TODO HARDWARE
-
-1. (X) Assemble `PT8211` prototype to mount on `Teensy 4.0`, connect to 24V 5A amplifier and speaker module.
-
-2. Run audio test in `/Telegraph/Documentation/Firmware Tests/0_Sine Wave/`
-
-2. Create PCB Schematics 
-```
-    a) Map inputs/outputs
-    b) Map all components
-    c) Map component circuit pinouts
-    d) Map circuit connections
-    e) Create Fusion file 
-```
 
 ## TODO FIRMWARE
 
 1. Use bounce library to do a simple debounce, and to measure the duration of a buttonpress.
-2. Measure buttons analog input to detect longer and shorter presses 
-3. Send PWM output to two LED fixtures 
-
+2. Measure buttons analog input to detect longer and shorter presses, connected to Pin 2
+3. Send PWM output to connected LED dome, connected to Pin 3
