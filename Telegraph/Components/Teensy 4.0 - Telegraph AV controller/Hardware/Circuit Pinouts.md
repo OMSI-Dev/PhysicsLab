@@ -1,5 +1,7 @@
 # Telegraph for Physics Lab Circuit Pinous
 
+*One circuit board per side of `telegraph`, two circuit boards total 
+
 *PT2811 pinout found in `/telegraph/Components/Teensy 4.1 - Telegraph AV controller/PRJC8211 Audio Shield/`
 
 ## Teensy 4.0 -> PT2811 (hardware-connected, not in custom circuit)
@@ -14,20 +16,26 @@
 
 ## Teensy 4.0 -> Circuit board
 1. GND -> GND
-2. VCC -> 5V
-
-## Buttons -> Circuit board (via ethernet)
-1. Normally Open(NO) Button #1 -> Pin 
-2. Normally Open(NO) Button #2 -> Pin 
-3. PWM Button #1 -> Pin 
-4. PWM Button #2 -> Pin
-5. GND -> GND
-6. GND -> GND
-
-## Teensy 4.0 -> LED Fixtures 
-1. Pin -> PWM Button #1
-2. Pin -> PWM Button #2
+2. VCC -> 5V 
 3. 
-4. 
+
+## Buttons -> Teensy(? JST failsafe(s))
+1. 12V -> 3.3V(?) -> Pin 
+2. GND -> GND
+
+## Teensy 4.0 -> LED Fixtures (to 2-pin Phoenix connectors)
+1. Pin -> LED
+2. GND -> LED GND
+
+## Light Fixutres
+1. 12V to 12V 
 
 
+# PCB Codes (OMSI_Basics Library in Fusion)
+
+1. JST_CONN_02 for Ethernet port failsafe(s)
+2. RJ45 Ethernet port 
+3. 
+
+# ?'s
+1. The LEDs are 12-pin, how are they connecting to the Teensy, and how are they getting powered?

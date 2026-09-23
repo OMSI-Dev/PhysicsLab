@@ -62,7 +62,7 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
 
 ## TODO FIRMWARE
 
-1. Use bounce library to trigger buttons
+1. Use bounce library to do a simple debounce, and to measure the duration of a buttonpress.
 2. Measure buttons analog input to detect longer and shorter presses 
 3. Send PWM output to two LED fixtures 
 
