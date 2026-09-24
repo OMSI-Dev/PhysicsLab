@@ -11,17 +11,28 @@ Two stations will each host a telegraph input. A station will trigger its' oppos
 
 The LED dome will output high-resolution fades to emulate an old incadescent light bulb. 
 
+## Checkpoints
 1. Read inbound short & long analog signals from the opposing button
 2. Output short & long sine-wave audio to the `PT8211`, depending on the received input
 3. Output short & long visual pulses on the LED dome, depending on the recieved input
 
-
+# Hardware Assembly
 ## LED domes
 LED domes are internally illuminated by the module [Z-G4-9WW](https://www.digikey.com/en/products/detail/jkl-components-corp/Z-G4-9WW/22677423), G-4 TWO-PIN 12V-24VDC WARM. 
 
 An onboard N-channel mosfet drives the LED's PWM pulses, controlled by Pin 3 on the `Teensy 4.0` controller. 
 
-# Hardware Assembly
+## Telegraph Inputs
+The telegraph inputs are [TODO (yet to be sourced)](github.com), 12V manual momentary contact switch. 
+
+The telegraph works in a series of resistors to bring the logic level voltage down to 3.3V, which can be read by the `Teensy 4.0`. 
+
+```
+12V -> 560 Ω -> Pin 14 of Teensy 4.0 -> 220 Ω -> GND
+                                          |
+                                          V
+                                         GND
+```
 
 ## PT8211 and the Teensy 4.0
 A `PT8211` audio shield [from PJRC](https://www.pjrc.com/store/pt8211_kit.html) is mounted on a `Teensy 4.0`, hosted on a custom circuit board.
@@ -81,23 +92,11 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
 
 ## TODO FIRMWARE
 
-1. Create telegraph firmware test for final input component
-
-2. Create LED firmware test for final LED output component
-
-3. Prototype version 1
-
-    a) (PENDING) Use bounce library to do a simple debounce, and to measure the duration of a buttonpress.
-    
-    b) (PENDING) Measure buttons analog input to detect longer and shorter presses, connected to Pin 2
-    
-    c) (PENDING) Send PWM output to connected LED dome, connected to Pin 3
-    
-2. Test prototype version 1 firmware against prototype hardware
+1. Verify functionality with LED modules. Assemble LED circuit board and test against it. 
 
 ## TODO Hardware
 
-1.  Test prototype against firmware w/ serial, measure long and short presses 
+1. None for now (-:
 
 ## Time management
 
