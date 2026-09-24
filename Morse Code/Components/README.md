@@ -97,10 +97,7 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
 
 ## TODO Hardware
 
-1.  
-
-2. Use a 3.3k and 1.7k resistor to step down prototype telegraph (alternatively a 560 and 220)
-2. (BLOCKED) Implement Aaron's solution for 12V to 3.3V conversion for telegraph input into schematic design
+1.  Test prototype against firmware w/ serial, measure long and short presses 
 
 ## Time management
 
