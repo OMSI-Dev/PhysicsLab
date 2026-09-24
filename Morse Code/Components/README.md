@@ -64,6 +64,7 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
         - (J3) JST connection
         
 ```
+    (*)= mounted, not soldered on
     
 2. Audio output parts:
 ```
@@ -75,11 +76,34 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
 3. Interactives:
 ```
     a) 2x buttons
-    b) 2x LED WS2812(?) fixtures
+    b) 2x LED fixtures
 ```
 
 ## TODO FIRMWARE
 
-1. Use bounce library to do a simple debounce, and to measure the duration of a buttonpress.
-2. Measure buttons analog input to detect longer and shorter presses, connected to Pin 2
-3. Send PWM output to connected LED dome, connected to Pin 3
+1. Create telegraph firmware test for final input component
+
+2. Create LED firmware test for final LED output component
+
+3. Prototype version 1
+
+    a) (PENDING) Use bounce library to do a simple debounce, and to measure the duration of a buttonpress.
+    
+    b) (PENDING) Measure buttons analog input to detect longer and shorter presses, connected to Pin 2
+    
+    c) (PENDING) Send PWM output to connected LED dome, connected to Pin 3
+    
+2. Test prototype version 1 firmware against prototype hardware
+
+## TODO Hardware
+
+1.  
+
+2. Use a 3.3k and 1.7k resistor to step down prototype telegraph (alternatively a 560 and 220)
+2. (BLOCKED) Implement Aaron's solution for 12V to 3.3V conversion for telegraph input into schematic design
+
+## Time management
+
+Sept 21-24 Telegraph
+
+
