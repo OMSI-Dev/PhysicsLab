@@ -83,6 +83,8 @@ void setup() {
   AudioMemory(12);
   sine1.frequency(TONE_FREQ_HZ);
   sine1.amplitude(0.0); // do not play at setup
+
+  Serial.println("Setup complete.");
 }
 
 void startPulse(uint16_t durationMs) {

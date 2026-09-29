@@ -6,7 +6,7 @@ The `detecting dark matter` project demonstrates a physics simulation by compari
 The two pieces are rolled down separate ramp tracks, the first arriving piece being more efficently loaded. 
 
 ## Objective of interactives
-Two switches are located at the bottom of each ramp. Each switch will trigger an audio file produced by a wavTrigger. 
+Two switches are located at the bottom of each ramp. Each switch will trigger an audio file produced by a `wavTrigger`. 
 
 Once a switch is triggered, the sound will play once, and lock out. 
 
@@ -18,7 +18,10 @@ After a switch is untriggered, there will be a 1 second delay, and the lock-out 
 1. Custom circuit board with parts:
 ```
     a) (*) Teensy 4.0 
-    b) terminal for 
+    b) (X1) Terminal for 5V (to 3.3V for Teensy)
+    c) (X2) Terminal for Switch #2
+    d) (X3) Terminal for Switch #1
+    e) (X4) Terminal for WavTrigger input 
 
 Teensy 4.0 talks to wavTrigger over serial 
 - Use wavTrigger library in WildCreativity (audio out)
