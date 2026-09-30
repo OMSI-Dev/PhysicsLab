@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://dbq2mymb31lj7"]
+
+[ext_resource type="Script" uid="uid://ciyve8r2aidbc" path="res://Slideshow.cs" id="1_ig7tw"]
+[ext_resource type="Texture2D" uid="uid://dlxq0x6ii02is" path="res://Media/English/English2.jpg" id="2_vivmo"]
+[ext_resource type="Texture2D" uid="uid://c14f6cr270fl6" path="res://Media/Spanish/Spanish2.jpg" id="3_2cqfq"]
+[ext_resource type="Texture2D" uid="uid://cfned7fddbu65" path="res://Media/English/English3.jpg" id="4_yaehf"]
+[ext_resource type="Texture2D" uid="uid://b23b668xo8msv" path="res://Media/Spanish/Spanish3.jpg" id="5_074og"]
+[ext_resource type="Texture2D" uid="uid://bqol2nwqsf0fv" path="res://Media/English/English4.jpg" id="6_cegan"]
+[ext_resource type="Texture2D" uid="uid://c14s6brtj4hu8" path="res://Media/Spanish/Spanish4.jpg" id="7_82xsv"]
+[ext_resource type="Texture2D" uid="uid://cj0vpd34tdrnv" path="res://Media/English/English5.jpg" id="8_getpj"]
+[ext_resource type="Texture2D" uid="uid://nvvn2j5g7ykb" path="res://Media/Spanish/Spanish5.jpg" id="9_ryguw"]
+[ext_resource type="Texture2D" uid="uid://c27qkuf1r86vu" path="res://Media/English/English6.jpg" id="10_d13ii"]
+[ext_resource type="Texture2D" uid="uid://4jursutxscg1" path="res://Media/Spanish/Spanish6.jpg" id="11_1u8w0"]
+[ext_resource type="Texture2D" uid="uid://dgv54hvoriros" path="res://Media/English/English7.jpg" id="12_0odxb"]
+[ext_resource type="Texture2D" uid="uid://gj8p6xrop6af" path="res://Media/Spanish/Spanish7.jpg" id="13_lswn8"]
+[ext_resource type="Texture2D" uid="uid://v2mfp8ly3ts0" path="res://Media/English/English1.jpg" id="14_a6jrf"]
+[ext_resource type="Texture2D" uid="uid://brxg7l56g5co1" path="res://Media/Spanish/Spanish1.jpg" id="15_xuqvo"]
+[ext_resource type="Script" uid="uid://dw14fogvuan55" path="res://SwipeDetector.cs" id="16_2cqfq"]
+
+[node name="SlideshowNode" type="Node2D" unique_id=1305739518 node_paths=PackedStringArray("_swipeScreen", "_solarScreen", "_windScreen", "_waveScreen", "_hydroScreen", "_geoScreen", "_resetScreen")]
+script = ExtResource("1_ig7tw")
+_swipeScreen = NodePath("CenterContainer/SwipeScreen")
+_solarScreen = NodePath("CenterContainer/SolarScreen")
+_windScreen = NodePath("CenterContainer/WindScreen")
+_waveScreen = NodePath("CenterContainer/WaveScreen")
+_hydroScreen = NodePath("CenterContainer/HydroelectricScreen")
+_geoScreen = NodePath("CenterContainer/GeothermalScreen")
+_resetScreen = NodePath("CenterContainer/ResetScreen")
+swipeEng = ExtResource("2_vivmo")
+swipeSpanish = ExtResource("3_2cqfq")
+solarEng = ExtResource("4_yaehf")
+solarSpanish = ExtResource("5_074og")
+windEng = ExtResource("6_cegan")
+windSpanish = ExtResource("7_82xsv")
+waveEng = ExtResource("8_getpj")
+waveSpanish = ExtResource("9_ryguw")
+hydroEng = ExtResource("10_d13ii")
+hydroSpanish = ExtResource("11_1u8w0")
+geoEng = ExtResource("12_0odxb")
+geoSpanish = ExtResource("13_lswn8")
+resetEng = ExtResource("14_a6jrf")
+resetSpanish = ExtResource("15_xuqvo")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=273535119]
+visible = false
+
+[node name="SwipeDetector" type="Node" parent="." unique_id=1206876543]
+script = ExtResource("16_2cqfq")
+
+[node name="Timer" type="Timer" parent="SwipeDetector" unique_id=974256245]
+wait_time = 0.5
+one_shot = true
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=338937005]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SwipeScreen" type="TextureRect" parent="CenterContainer" unique_id=42864728]
+layout_mode = 2
+
+[node name="SolarScreen" type="TextureRect" parent="CenterContainer" unique_id=1640736789]
+layout_mode = 2
+
+[node name="WindScreen" type="TextureRect" parent="CenterContainer" unique_id=207325632]
+layout_mode = 2
+
+[node name="WaveScreen" type="TextureRect" parent="CenterContainer" unique_id=1100660104]
+layout_mode = 2
+
+[node name="HydroelectricScreen" type="TextureRect" parent="CenterContainer" unique_id=1899772382]
+layout_mode = 2
+
+[node name="GeothermalScreen" type="TextureRect" parent="CenterContainer" unique_id=2055405416]
+layout_mode = 2
+
+[node name="ResetScreen" type="TextureRect" parent="CenterContainer" unique_id=2095446325]
+layout_mode = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1274516094]
+
+[connection signal="timeout" from="SwipeDetector/Timer" to="SwipeDetector" method="_on_timer_timeout"]
