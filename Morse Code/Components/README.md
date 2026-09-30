@@ -46,7 +46,8 @@ PRJC's `PT8211 T4` variation is used for  `morse code`.
 
 Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure the `T4` variation is used. 
 
-## Summary of components
+
+# Summary of components
 1. Custom circuit board with parts:
 ```
     a) (*) Teensy 4.0 w/ PT8211 header to amp 
@@ -79,7 +80,7 @@ Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure th
     
 2. Audio output parts:
 ```
-    a) amplifier to speaker
+    a) ZK-502T amplifier to speaker
     b) speaker
     c) 24V 5A power supply
 ```

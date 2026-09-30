@@ -22,7 +22,7 @@
 #include <Audio.h>
 
 constexpr uint8_t PIN_SIGNAL_IN = 14;   // signal from opposing station
-constexpr uint8_t PIN_LED       = 3;   // LED dome PWM output 
+constexpr uint8_t PIN_LED       = 11;   // LED dome PWM output 
 
 constexpr uint16_t DEBOUNCE_INTERVAL_MS = 5;    // Bounce2 debounce interval
 
