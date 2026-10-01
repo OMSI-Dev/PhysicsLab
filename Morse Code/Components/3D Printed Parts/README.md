@@ -53,15 +53,15 @@ Ignore wiping
 # Bridging
 BRIDGE COUNTERBORE HOLES: PARTIALLY BRIDGED, or fully bridged if it's giving you trouble. for overhangs 
 
-# Overhang
-Extra perieters on overhngs: helps bridge small bidges
 
 # Speed
 Outer wall to 75mm, inner wall as is. Slice and go to speed section 
 
 
 ## Overhang
-Slow down for overhang and bridge support. 
+- Slow down for overhang and bridge support. 
+- Extra perieters on overhangs: helps bridge small bridges (gaps)
+- Slow down for curled perimeters
 
 # Others
 - Brims are usually always necessary 
