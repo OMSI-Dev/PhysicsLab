@@ -1,5 +1,5 @@
 # Physics Lab
-1. `Telegraph`
-2. `Detecting Dark Matter`
+1. `Detecting Dark Matter`
+2. `Digital Signage`
 3. `Harmonograph`
-4. `Digital Signage`
+4. `Morse Code`
