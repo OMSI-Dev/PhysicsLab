@@ -47,6 +47,32 @@ PRJC's `PT8211 T4` variation is used for  `morse code`.
 
 Refer to [this guide](https://www.pjrc.com/store/pt8211_kit.html), and ensure the `T4` variation is used. 
 
+***
+**Note:** Information below will become outdated! Modifications needed to the circuit board:
+
+- Direct-routed 500 Ohm resistor to signal out
+
+- Jumper header for telegraph A/B designation 
+
+- GND and 3.3V connected to Teensy 
+
+- Labels on Phoenix Connector terminals 
+
+- Rereouted signal in/out to pins 14 and 15
+
+Modifications needed to the firmware:
+
+- Self-identifying telegraph A/B 
+
+- New pinouts for telegraph A/B
+
+```
+if i am telegraph A, I recieve via pin 14, and transmit via pin 15
+
+if i am telegraph B, I recieve via pin 15, and tranmit via pin 14
+```
+
+***
 
 # Component Specifications
 
