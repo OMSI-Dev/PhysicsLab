@@ -1,70 +1,57 @@
-// ============================================================================
-// Telegraph Receiver Test
+// Telegraph AV Controller
 //
-// Both boards run IDENTICAL firmware. Pressing the telegraph key on one station
-// triggers the sound + LED on the OPPOSING station.
+// Plays a tone and lights an LED dome when the telegraph key at the other
+// station is pressed. Both stations run the same firmware.
 //
-//   - Pin 14 receives the opposing station's key signal (via SW_IN -> 560 ohm
-//     -> Pin 14, with 220 ohm to GND). REQUIRES THE SW_OUT HOTWIRE: SW_OUT is
-//     taken from Q6's drain (not the key/gate net), so a press actively drives
-//     12V down the line. At Pin 14 the signal is ACTIVE-HIGH: idle 0V (LOW,
-//     held by the 220 ohm), pressed ~3.38V (HIGH).
-//   - Each received press is classified SHORT or LONG by SHORT_LONG_THRESHOLD_MS.
-//   - The classification triggers a FIXED-duration output (not a copy of the
-//     actual press length):
-//       * A sine tone on the PT8211 (Teensy Audio Library / I2S)
-//       * A PWM glow on the LED dome (Pin 3): a thermal filament model gives a
-//         soft warm-up and a lingering cool-down, like an incandescent bulb.
-//         The glow keeps fading briefly after the pulse itself has ended.
+// Input
+//   Pin 14 reads the far key through a 560 ohm / 220 ohm divider.
+//   Idle is LOW, pressed is HIGH (about 3.4 V).
+//   The v1 board needs SW_OUT wired from the drain of Q6.
 //
-// Boot guard: the input stays DISARMED until Pin 14 has read LOW (idle) for
-// ARM_AFTER_IDLE_MS, so a key held during boot or a stuck-high line can't
-// fire outputs. Note: with the active-high hotwire, a disconnected cable
-// reads the same as idle, so a missing cable can no longer be detected.
+// Output
+//   A press shorter than 200 ms is SHORT, anything longer is LONG.
+//   SHORT plays a 150 ms pulse, LONG plays a 450 ms pulse.
+//   Each pulse plays a 600 Hz tone and glows the LED like an incandescent bulb.
 //
-// Hardware pin map:
-//   Pin 14 -> incoming SW_DATA (active-high, Bounce2 debounced)
-//   Pin 3  -> LED_DATA (PWM to onboard N-channel MOSFET, Q5)
-//   Pin 21 -> PT8211 BCK
-//   Pin 20 -> PT8211 WS
-//   Pin 7  -> PT8211 DIN
-//   Pin 15 -> NOT USED in this test. Keep it disconnected from the MISC lines.
-// ============================================================================
+// Startup
+//   Input stays disabled until Pin 14 has been LOW for 100 ms. A key held
+//   during power-up, or a stuck line, is ignored.
+//
+// Pins
+//   14  Signal in
+//   3   LED dome (PWM)
+//   21  PT8211 BCK
+//   20  PT8211 WS
+//   7   PT8211 DIN
 
 #include <Bounce2.h>
 #include <Audio.h>
 
-constexpr uint8_t PIN_SIGNAL_IN = 14;   // signal from opposing station
-constexpr uint8_t PIN_LED       = 3;    // LED_DATA
+constexpr uint8_t PIN_SIGNAL_IN = 14;
+constexpr uint8_t PIN_LED       = 3;
 
-constexpr uint16_t DEBOUNCE_INTERVAL_MS = 5;
-constexpr uint16_t ARM_AFTER_IDLE_MS    = 100;   // idle HIGH time before inputs count
+constexpr uint16_t DEBOUNCE_INTERVAL_MS  = 5;
+constexpr uint16_t ARM_AFTER_IDLE_MS     = 100;   // LOW time required before input is enabled
 constexpr uint16_t NOT_CONNECTED_WARN_MS = 2000;
 
-// Short/long classification and fixed outputs
 constexpr uint16_t SHORT_LONG_THRESHOLD_MS = 200;
 constexpr uint16_t OUTPUT_SHORT_MS = 150;
 constexpr uint16_t OUTPUT_LONG_MS  = 450;
 
-// Sound
 constexpr float TONE_FREQ_HZ   = 600.0;
 constexpr float TONE_AMPLITUDE = 0.5;
 
-// LED dome
-// If the fade looks like a plain on/off, try a lower frequency (e.g. 1000-2000).
 constexpr uint8_t  LED_PWM_RESOLUTION_BITS = 12;
 constexpr uint32_t LED_PWM_FREQUENCY_HZ    = 2000;
 constexpr uint16_t LED_MAX_DUTY = (1 << LED_PWM_RESOLUTION_BITS) - 1;
 
-// Incandescent filament model: a "temperature" state heats/cools exponentially
-// toward on/off, and light output rises steeply with temperature, so the glow
-// swells up softly and lingers as a dim ember after the key is released.
-constexpr float    LED_HEAT_TAU_MS      = 75.0f;    // warm-up time constant (larger = slower swell)
-constexpr float    LED_COOL_TAU_MS      = 260.0f;   // cool-down time constant (larger = longer afterglow)
-constexpr float    LED_OUTPUT_EXPONENT  = 2.0f;     // light ~ temp^N (higher = dimmer, redder tail)
+// LED glow model: a filament "temperature" heats and cools exponentially,
+// and brightness is temperature raised to LED_OUTPUT_EXPONENT.
+constexpr float    LED_HEAT_TAU_MS      = 75.0f;    // warm-up time constant
+constexpr float    LED_COOL_TAU_MS      = 260.0f;   // cool-down time constant
+constexpr float    LED_OUTPUT_EXPONENT  = 2.0f;
 constexpr uint16_t LED_UPDATE_PERIOD_MS = 2;
 
-// PT8211 DAC
 AudioSynthWaveformSine sine1;
 AudioOutputPT8211      dac;
 AudioConnection        patchCord1(sine1, 0, dac, 0);
@@ -87,9 +74,9 @@ bool armed = false;
 void setup() {
   Serial.begin(9600);
   delay(100);
-  Serial.println("\n=== Telegraph Receiver Test ===");
+  Serial.println("\nTelegraph AV Controller");
 
-  button.attach(PIN_SIGNAL_IN, INPUT);   // external 220 ohm to GND defines idle
+  button.attach(PIN_SIGNAL_IN, INPUT);   // idle level set by the external 220 ohm to GND
   button.interval(DEBOUNCE_INTERVAL_MS);
   button.setPressedState(HIGH);
 
@@ -101,7 +88,7 @@ void setup() {
   sine1.frequency(TONE_FREQ_HZ);
   sine1.amplitude(0.0);
 
-  Serial.println("Setup complete. Waiting for Pin 14 to idle LOW...");
+  Serial.println("Waiting for Pin 14 to idle LOW");
 }
 
 void startPulse(uint16_t durationMs) {
@@ -113,7 +100,6 @@ void startPulse(uint16_t durationMs) {
 void updateInput() {
   button.update();
 
-  // Stay disarmed until the line has idled LOW (far key released, no fault)
   if (!armed) {
     static elapsedMillis idleFor = 0;
     static bool warned = false;
@@ -121,12 +107,12 @@ void updateInput() {
     if (button.isPressed()) {
       idleFor = 0;
       if (!warned && millis() > NOT_CONNECTED_WARN_MS) {
-        Serial.println("WARNING: Pin 14 is HIGH. Far key held, or line fault?");
+        Serial.println("Warning: Pin 14 is HIGH. Key held or line fault?");
         warned = true;
       }
     } else if (idleFor >= ARM_AFTER_IDLE_MS) {
       armed = true;
-      Serial.println("Input armed (Pin 14 idles LOW).");
+      Serial.println("Input armed");
     }
     return;
   }
@@ -139,26 +125,19 @@ void updateInput() {
   }
   else if (buttonHoldState == ButtonHoldState::PRESSING) {
     if (!button.isPressed()) {
-      // Released before hitting the long threshold
       uint16_t heldMs = pressStart;
       if (heldMs < SHORT_LONG_THRESHOLD_MS) {
-        Serial.print("Press detected: ");
+        Serial.print("SHORT press, ");
         Serial.print(heldMs);
-        Serial.print(" ms -> SHORT (output ");
-        Serial.print(OUTPUT_SHORT_MS);
-        Serial.println(" ms)");
+        Serial.println(" ms");
         startPulse(OUTPUT_SHORT_MS);
       }
       buttonHoldState = ButtonHoldState::IDLE;
     }
     else if (pressStart >= SHORT_LONG_THRESHOLD_MS) {
-      // Crossed the threshold: fire immediately
+      // Fire as soon as the press crosses the threshold
       buttonHoldState = ButtonHoldState::LONG_TRIGGERED;
-      Serial.print("Press detected: LONG at ");
-      Serial.print(pressStart);
-      Serial.print(" ms (output ");
-      Serial.print(OUTPUT_LONG_MS);
-      Serial.println(" ms)");
+      Serial.println("LONG press");
       startPulse(OUTPUT_LONG_MS);
     }
   }
@@ -180,7 +159,7 @@ void updateAudio() {
 
 void updateLED() {
   static elapsedMillis sinceLastUpdate;
-  static float filament = 0.0f;   // normalized filament temperature, 0.0 - 1.0
+  static float filament = 0.0f;   // 0.0 (cold) to 1.0 (hot)
 
   if (sinceLastUpdate < LED_UPDATE_PERIOD_MS) return;
   float dtMs = (float)sinceLastUpdate;

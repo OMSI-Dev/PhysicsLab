@@ -208,4 +208,8 @@ Main signals are `SW_OUT` and `SW_IN`, both which get bridged to the signal path
 3. MISC(3)
 4. MISC(4)
 
+# Notes for future development
+
+from autumn: I tested both systems on one shared power supply. On final install, each system had its' separate power supply. A `GND` connection is not shared on board-to-board, which may have caused some transmission issues that needed to be corrected in the second iteration of the PCB design.
+
 
