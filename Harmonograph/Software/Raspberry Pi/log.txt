@@ -1,8 +1,9 @@
-Start time of app: 2026-09-24 14:45:16.595485
-Camera resolution: 1920x1080
-Camera FPS: 30.0
-End time of app: 2026-09-24 14:45:47.370044
-Start time of app: 2026-09-24 14:46:26.049982
+Log Cleared. Over 1000 Bytes
+Start time of app: 2026-10-27 14:35:23.289455
 Camera resolution: 1920x1080
 Camera FPS: 60.0
-End time of app: 2026-09-24 14:47:01.864737
+Start time of app: 2026-10-27 14:45:38.939109
+Camera resolution: 1920x1080
+Camera FPS: 60.0
+Mask Location:/home/aaron/github/PhysicsLab/Harmonograph/Software/Raspberry Pi/assets/images/mask.png
+End time of app: 2026-10-27 14:48:24.989888
