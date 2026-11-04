@@ -1,5 +1,10 @@
 # Detecting Dark Matter for Physics Lab 
 
+<img src = "Documentation/Photos/Teensy40_Main-Controller-PCB.png" width="500" alt="Teensy40_Main-Controller-PCB.png">
+
+<img src = "Documentation/Photos/Teensy40_Main-Controller-Schematic.png" width="500" alt="Teensy40_Main-Controller-Schematic.png">
+
+
 ## Summary of interactives
 The `detecting dark matter` project demonstrates a physics simulation by comparing two cylindrical forces of motion each with differing porportions of mass. 
 
@@ -29,6 +34,10 @@ After a switch is untriggered, there will be a 1 second delay, and the lock-out 
     d) (X3) Terminal for Switch #1 (custom switch circuit) to Teensy Pin 14
     e) (X4) Terminal for WavTrigger input to Teensy Pins 0 & 1 (TX & RX)
 ```
+
+2. Parts:
+
+**Switches:** V-154-1C25
 
 # Assets 
 1. Sound 1: `win.wav`
