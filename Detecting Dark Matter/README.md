@@ -3,7 +3,7 @@
 ## Summary of interactives
 The `detecting dark matter` project demonstrates a physics simulation by comparing two cylindrical forces of motion each with differing porportions of mass. 
 
-The two pieces are rolled down separate ramp tracks, the first arriving piece being more efficently loaded. 
+Two interactive pieces are rolled down individual ramp tracks, the first arriving piece being more `efficently loaded`. 
 
 ## Objective of interactives
 Two switches are located at the bottom of each ramp. Each switch will trigger an audio file produced by a `wavTrigger`. A `first place` sound will be triggered by the first-landing piece, while a `second place` sound will be triggered by the second-landing piece.
@@ -11,6 +11,12 @@ Two switches are located at the bottom of each ramp. Each switch will trigger an
 Once a switch is triggered, the sound will play once, and lock out. 
 
 After a switch is untriggered, there will be a 1 second delay, and the lock-out resets for the sound to be triggered again.
+
+## Checkpoints 
+
+1. Trigger two switches, firmware identifying which switch triggers first 
+2. Output sound for each switch via `Wavtrigger` (2x .mp3 files stored in SD-card) to amp to external speaker
+3. Build logic for a reset cycle
 
 # Hardware Assembly
 
