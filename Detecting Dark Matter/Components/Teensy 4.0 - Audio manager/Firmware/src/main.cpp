@@ -1,132 +1,151 @@
+/*
+ * Detecting Dark Matter - Audio Manager
+ * Teensy 4.0 + SparkFun WAV Trigger
+ *
+ * Each of the two switches plays one sound when pressed.
+ * After 25 rounds in which both switches were pressed, the next round
+ * plays a bonus sound for each switch, then the count starts over.
+ *
+ * SD card files:
+ *   001_*.wav  switch 1        003_*.wav  switch 1 bonus
+ *   002_*.wav  switch 2        004_*.wav  switch 2 bonus
+ */
+
 #include <Arduino.h>
 
-// ---- Pins ------------------------------------------------------------------
-constexpr uint8_t PIN_SWITCH_1 = 14;  // X3
-constexpr uint8_t PIN_SWITCH_2 = 15;  // X2
-constexpr uint8_t PIN_LED = LED_BUILTIN;
-// WAV Trigger on Serial1: RX1 = pin 0, TX1 = pin 1
+// Pins (the WAV Trigger connects to Serial1: pin 0 = RX1, pin 1 = TX1)
+constexpr uint8_t NUM_SWITCHES = 2;
+constexpr uint8_t SWITCH_PINS[NUM_SWITCHES] = {14, 15};
+constexpr uint8_t LED_PIN = LED_BUILTIN;
 
-// ---- Switch polarity (flip if bench test shows the opposite) ---------------
-constexpr bool SWITCH_ACTIVE_LOW = true;  // true: INPUT_PULLUP, LOW = triggered
+// true: switch pulls the pin LOW when pressed
+constexpr bool SWITCH_ACTIVE_LOW = true;
 
-// ---- Timing ----------------------------------------------------------------
+// Timing (milliseconds)
 constexpr uint32_t DEBOUNCE_MS = 20;
-constexpr uint32_t RESET_DELAY_MS = 1000;  // after all switches released
+constexpr uint32_t RESET_DELAY_MS = 1000;  // wait after all switches are released
 constexpr uint32_t LED_FLASH_MS = 100;
 
-// ---- WAV Trigger -----------------------------------------------------------
+// WAV Trigger
 constexpr uint32_t WAVTRIGGER_BAUD = 57600;
-constexpr uint16_t TRACK_FIRST_PLACE = 1;   // SD card file 001_*.wav
-constexpr uint16_t TRACK_SECOND_PLACE = 2;  // SD card file 002_*.wav
-
-constexpr uint8_t NUM_SWITCHES = 2;
-constexpr uint8_t SWITCH_PINS[NUM_SWITCHES] = {PIN_SWITCH_1, PIN_SWITCH_2};
+constexpr uint16_t NORMAL_TRACKS[NUM_SWITCHES] = {1, 2};
+constexpr uint16_t BONUS_TRACKS[NUM_SWITCHES] = {3, 4};
+constexpr uint8_t ROUNDS_BEFORE_BONUS = 25;
 
 struct Switch {
-  bool triggered;         // debounced state
-  bool lastRaw;           // last raw reading
-  uint32_t lastChangeMs;  // when raw reading last changed
-  bool lockedOut;         // has already played a sound this round
+  bool pressed;           // debounced state
+  bool lastReading;       // most recent raw reading
+  uint32_t lastChangeMs;  // when the raw reading last changed
+  bool played;            // already played its sound this round
 };
 
 Switch switches[NUM_SWITCHES];
-int8_t winner = -1;               // index of first switch triggered this round, -1 if none
-uint32_t allReleasedSinceMs = 0;  // when every switch became released
+uint32_t releasedSinceMs = 0;
 uint32_t ledOffAtMs = 0;
+uint8_t bothPressedRounds = 0;
 
-bool readTriggered(uint8_t pin) {
+bool isPressed(uint8_t pin) {
   return digitalRead(pin) == (SWITCH_ACTIVE_LOW ? LOW : HIGH);
 }
 
-// Poly play so the second-place sound can overlap the first-place sound.
-void wavTriggerPlayPoly(uint16_t track) {
+// Starts a track without stopping others, so both sounds can overlap.
+void playTrack(uint16_t track) {
   const uint8_t msg[] = {0xF0, 0xAA, 0x08, 0x03, 0x01,
                          static_cast<uint8_t>(track & 0xFF),
                          static_cast<uint8_t>(track >> 8), 0x55};
   Serial1.write(msg, sizeof(msg));
 }
 
-void onTriggered(uint8_t i) {
-  if (switches[i].lockedOut) {
+void onPressed(uint8_t i) {
+  if (switches[i].played) {
     return;
   }
-  switches[i].lockedOut = true;
+  switches[i].played = true;
 
-  uint16_t track;
-  if (winner < 0) {
-    winner = i;
-    track = TRACK_FIRST_PLACE;
-  } else {
-    track = TRACK_SECOND_PLACE;
-  }
+  const bool bonus = bothPressedRounds >= ROUNDS_BEFORE_BONUS;
+  const uint16_t track = bonus ? BONUS_TRACKS[i] : NORMAL_TRACKS[i];
+  playTrack(track);
 
-  wavTriggerPlayPoly(track);
-  digitalWrite(PIN_LED, HIGH);
+  digitalWrite(LED_PIN, HIGH);
   ledOffAtMs = millis() + LED_FLASH_MS;
 
-  Serial.printf("Switch %u triggered -> track %u (%s)\n", i + 1, track,
-                track == TRACK_FIRST_PLACE ? "first place" : "second place");
+  Serial.printf("Switch %u -> track %u\n", i + 1, track);
+}
+
+// Ends the round and updates the bonus counter.
+void endRound() {
+  bool anyPlayed = false;
+  bool allPlayed = true;
+  for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
+    anyPlayed |= switches[i].played;
+    allPlayed &= switches[i].played;
+    switches[i].played = false;
+  }
+  if (!anyPlayed) {
+    return;
+  }
+
+  if (bothPressedRounds >= ROUNDS_BEFORE_BONUS) {
+    bothPressedRounds = 0;
+  } else if (allPlayed) {
+    bothPressedRounds++;
+  }
+  Serial.printf("Round over (%u/%u)\n", bothPressedRounds, ROUNDS_BEFORE_BONUS);
 }
 
 void setup() {
   Serial.begin(115200);
   Serial1.begin(WAVTRIGGER_BAUD);
 
-  pinMode(PIN_LED, OUTPUT);
-  digitalWrite(PIN_LED, LOW);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
 
   for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
     pinMode(SWITCH_PINS[i], SWITCH_ACTIVE_LOW ? INPUT_PULLUP : INPUT);
-    const bool state = readTriggered(SWITCH_PINS[i]);
-    switches[i] = {state, state, millis(), state};  // a switch held at boot stays locked out
+    const bool state = isPressed(SWITCH_PINS[i]);
+    // A switch held down at power-up stays silent until released.
+    switches[i] = {state, state, millis(), state};
   }
-  allReleasedSinceMs = millis();
+  releasedSinceMs = millis();
 
-  Serial.println("Detecting Dark Matter audio manager ready");
+  Serial.println("Audio manager ready");
 }
 
 void loop() {
   const uint32_t now = millis();
 
+  // Read and debounce each switch.
   for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
     Switch &s = switches[i];
-    const bool raw = readTriggered(SWITCH_PINS[i]);
+    const bool reading = isPressed(SWITCH_PINS[i]);
 
-    if (raw != s.lastRaw) {
-      s.lastRaw = raw;
+    if (reading != s.lastReading) {
+      s.lastReading = reading;
       s.lastChangeMs = now;
     }
 
-    if (raw != s.triggered && now - s.lastChangeMs >= DEBOUNCE_MS) {
-      s.triggered = raw;
-      if (s.triggered) {
-        onTriggered(i);
+    if (reading != s.pressed && now - s.lastChangeMs >= DEBOUNCE_MS) {
+      s.pressed = reading;
+      if (s.pressed) {
+        onPressed(i);
       }
     }
   }
 
-  // Round resets once every switch has been released for RESET_DELAY_MS.
-  bool anyTriggered = false;
+  // Once all switches have been released for a while, start a new round.
+  bool anyPressed = false;
   for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
-    anyTriggered |= switches[i].triggered;
+    anyPressed |= switches[i].pressed;
   }
 
-  if (anyTriggered) {
-    allReleasedSinceMs = now;
-  } else if (now - allReleasedSinceMs >= RESET_DELAY_MS) {
-    bool needsReset = (winner >= 0);
-    for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
-      needsReset |= switches[i].lockedOut;
-      switches[i].lockedOut = false;
-    }
-    winner = -1;
-    if (needsReset) {
-      Serial.println("Lock-out reset");
-    }
+  if (anyPressed) {
+    releasedSinceMs = now;
+  } else if (now - releasedSinceMs >= RESET_DELAY_MS) {
+    endRound();
   }
 
   if (ledOffAtMs != 0 && static_cast<int32_t>(now - ledOffAtMs) >= 0) {
-    digitalWrite(PIN_LED, LOW);
+    digitalWrite(LED_PIN, LOW);
     ledOffAtMs = 0;
   }
 }
