@@ -44,11 +44,17 @@ Releasing a switch does not unlock it. The lock-out only clears once **both** sw
 
 **Switches:** [V-154-1C25](https://www.digikey.com/en/products/detail/omron-electronics-inc-emc-div/V-154-1C25/1829023)
 
-Firmware reads each switch with the Teensy's internal pull-up, so a pressed switch must pull the pin to ground (active-low). If the switch circuit is wired the opposite way, flip `SWITCH_ACTIVE_LOW` in `main.cpp`.
+Firmware reads each switch with the Teensy's internal pull-up.
 
 **WAV Trigger:** connected to `Serial1` (Teensy pin 0 = RX1, pin 1 = TX1) at 57600 baud (the WAV Trigger default).
 
 **Microcontroller:** [Teensy 4.0](https://www.pjrc.com/store/teensy40.html)
+
+**Amplifier** [ZK-502T_Audio-Amplifier](Documentation/ZK-502T_Audio-Amplifier/ZK-502T_documentation.pdf)
+
+**Speaker** 
+
+
 
 
 # Assets 
