@@ -1,5 +1,5 @@
-# Detecting Dark Matter for Physics Lab 
-<img src = "Documentation/Photos/Teensy40_Main-Controller-Schematic.png" width="800" alt="Teensy40_Main-Controller-Schematic.png">
+# Detecting Dark Matter for OMSI's Physics Lab 
+<img src = "Documentation/Photos/Teensy40_Main-Controller-Schematic.png" width="900" alt="Teensy40_Main-Controller-Schematic.png">
 
 <img src = "Documentation/Photos/Teensy40_Main-Controller-PCB.png" width="500" alt="Teensy40_Main-Controller-PCB.png">
 
