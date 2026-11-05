@@ -1,11 +1,6 @@
 # Detecting Dark Matter for OMSI's Physics Lab 
 <img src = "Documentation/Photos/Teensy40_Main-Controller-Schematic.png" width="900" alt="Teensy40_Main-Controller-Schematic.png">
 
-<img src = "Documentation/Photos/Teensy40_Main-Controller-PCB.png" width="500" alt="Teensy40_Main-Controller-PCB.png">
-
-
-
-
 ## Summary of interactives
 The `detecting dark matter` project demonstrates a physics simulation by comparing two cylindrical forces of motion each with differing porportions of mass. 
 
@@ -31,6 +26,8 @@ Releasing a switch does not unlock it. The lock-out only clears once **both** sw
 3. Build logic for a reset cycle
 
 # Hardware Assembly
+
+<img src = "Documentation/Photos/Teensy40_Main-Controller-PCB.png" width="500" alt="Teensy40_Main-Controller-PCB.png">
 
 ## Summary of components
 
