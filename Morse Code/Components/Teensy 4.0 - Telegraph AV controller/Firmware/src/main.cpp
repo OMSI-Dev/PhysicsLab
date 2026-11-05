@@ -40,9 +40,10 @@ constexpr uint16_t OUTPUT_LONG_MS  = 450;
 
 constexpr float TONE_FREQ_HZ   = 600.0;
 constexpr float TONE_AMPLITUDE = 0.5;
+constexpr uint16_t TONE_RAMP_MS = 10;   // attack/release ramp to avoid clicks
 
 constexpr uint8_t  LED_PWM_RESOLUTION_BITS = 12;
-constexpr uint32_t LED_PWM_FREQUENCY_HZ    = 2000;
+constexpr uint32_t LED_PWM_FREQUENCY_HZ    = 30000;   // above audible range
 constexpr uint16_t LED_MAX_DUTY = (1 << LED_PWM_RESOLUTION_BITS) - 1;
 
 // LED glow model: a filament "temperature" heats and cools exponentially,
@@ -149,12 +150,18 @@ void updateInput() {
 }
 
 void updateAudio() {
-  static PulseState lastPulseState = PulseState::IDLE;
+  float envelope = 0.0f;
 
-  if (pulseState != lastPulseState) {
-    sine1.amplitude(pulseState == PulseState::ACTIVE ? TONE_AMPLITUDE : 0.0);
-    lastPulseState = pulseState;
+  if (pulseState == PulseState::ACTIVE) {
+    uint32_t t = pulseElapsed;
+    if (t < pulseDurationMs) {
+      float fadeIn  = min(1.0f, t / (float)TONE_RAMP_MS);
+      float fadeOut = min(1.0f, (pulseDurationMs - t) / (float)TONE_RAMP_MS);
+      envelope = min(fadeIn, fadeOut);
+    }
   }
+
+  sine1.amplitude(TONE_AMPLITUDE * envelope);
 }
 
 void updateLED() {
