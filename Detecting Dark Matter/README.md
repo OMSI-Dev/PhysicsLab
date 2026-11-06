@@ -42,6 +42,8 @@ Releasing a switch does not unlock it. The lock-out only clears once **both** sw
 
 2. Parts:
 
+*Find more resources in /Documentation/ of this repository.*
+
 **Switches:** [V-154-1C25](https://www.digikey.com/en/products/detail/omron-electronics-inc-emc-div/V-154-1C25/1829023)
 
 Firmware reads each switch with the Teensy's internal pull-up.
