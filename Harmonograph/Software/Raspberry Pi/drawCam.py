@@ -36,9 +36,12 @@ log.flush()
 log_file_size = os.path.getsize(log_file_path)
 print(log_file_size)
 
-mask_dir = current_dir + "/assets/images/mask.png"
-log = open(log_file_path, "a")
-log.write("Mask Location:" + mask_dir + '\n')
+mask_dir1 = os.path.join(current_dir, "assets/images/mask1.png")
+mask_dir2 = os.path.join(current_dir, "assets/images/mask2.png")
+mask_dir3 = os.path.join(current_dir, "assets/images/mask3.png")
+mask_dir4 = os.path.join(current_dir, "assets/images/mask4.png")
+
+log.write("Mask Location:" + mask_dir1 + '\n')
 log.flush()
 
 if log_file_size > 1000:
@@ -51,17 +54,23 @@ if log_file_size > 1000:
     log.write("Camera FPS: " + str(FPS) + '\n')
     log.flush()
 
-label_Cam = tk.Label(app, width=width, height=height)
-label_Cam.pack()
+label_Cam = tk.Label(app)
+label_Cam.pack(fill="both", expand=True)
 
 # Load mask once, resize to frame size, keep alpha
 try:
-    mask_img = Image.open(mask_dir).convert("RGBA")
+    mask_img = Image.open(mask_dir1).convert("RGBA")
     mask_img = mask_img.resize((width, height), Image.LANCZOS)
 except Exception as e:
     log.write("Mask load error: " + str(e) + '\n')
     log.flush()
     mask_img = None
+
+def grab_focus():
+    app.lift()
+    app.focus_force()
+    app.grab_set()
+    app.after(100, app.focus_force)
 
 def cleanup_and_exit():
     log.write("End time of app: " + str(datetime.datetime.now()) + '\n')
@@ -69,6 +78,27 @@ def cleanup_and_exit():
     log.close()
     vid.release()
     app.destroy()
+
+def changeImage(currentMask):
+    global mask_img
+    try:
+        if currentMask == 1:
+            print("Updating Mask")
+            mask_img = Image.open(mask_dir1).convert("RGBA")
+            mask_img = mask_img.resize((width, height), Image.LANCZOS)
+        elif currentMask == 2:
+            mask_img = Image.open(mask_dir2).convert("RGBA")
+            mask_img = mask_img.resize((width, height), Image.LANCZOS)
+        elif currentMask == 3:
+            mask_img = Image.open(mask_dir3).convert("RGBA")
+            mask_img = mask_img.resize((width, height), Image.LANCZOS)
+        elif currentMask == 4:
+            mask_img = Image.open(mask_dir4).convert("RGBA")
+            mask_img = mask_img.resize((width, height), Image.LANCZOS)
+    except Exception as e:
+        log.write("Mask load error: " + str(e) + '\n')
+        log.flush()
+        mask_img = None
 
 def camRead():
     try:
@@ -88,17 +118,20 @@ def camRead():
     capImg = Image.fromarray(cvImg).convert("RGBA")
 
     if mask_img is not None:
-        # Composite mask over camera frame
         composite = Image.alpha_composite(capImg, mask_img)
     else:
         composite = capImg
 
     tkImage = ImageTk.PhotoImage(image=composite)
     label_Cam.photo = tkImage
-    label_Cam.configure(image=tkImage, width=width, height=height)
+    label_Cam.configure(image=tkImage)
     label_Cam.after(5, camRead)
 
 app.bind('<Escape>', lambda e: cleanup_and_exit())
+app.bind('<KeyPress-1>', lambda e: changeImage(1))
+app.bind('<KeyPress-2>', lambda e: changeImage(2))
+app.bind('<KeyPress-3>', lambda e: changeImage(3))
+app.bind('<KeyPress-4>', lambda e: changeImage(4))
 app.protocol("WM_DELETE_WINDOW", cleanup_and_exit)
 
 app.geometry("1920x1080")
@@ -107,6 +140,7 @@ app.overrideredirect(True)
 camRead()
 
 try:
+    app.after(50, grab_focus)
     app.mainloop()
 except KeyboardInterrupt:
     cleanup_and_exit()

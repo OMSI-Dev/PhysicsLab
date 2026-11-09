@@ -1,9 +1,5 @@
 Log Cleared. Over 1000 Bytes
-Start time of app: 2026-10-27 14:35:23.289455
+Start time of app: 2026-11-06 16:11:30.422048
 Camera resolution: 1920x1080
 Camera FPS: 60.0
-Start time of app: 2026-10-27 14:45:38.939109
-Camera resolution: 1920x1080
-Camera FPS: 60.0
-Mask Location:/home/aaron/github/PhysicsLab/Harmonograph/Software/Raspberry Pi/assets/images/mask.png
-End time of app: 2026-10-27 14:48:24.989888
+End time of app: 2026-11-06 16:11:44.624860
