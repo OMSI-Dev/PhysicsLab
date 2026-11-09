@@ -15,7 +15,8 @@ width, height = 1920, 1080
 app = tk.Tk()
 
 vid = cv2.VideoCapture(0, cv2.CAP_ANY)
-FPS = 60.0
+FPS = 30.0
+FRAME_DELAY_MS = max(1, int(1000 / FPS))
 vid.set(cv2.CAP_PROP_FPS, FPS)
 vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
 vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
@@ -111,7 +112,7 @@ def camRead():
         return
 
     if not ret or frame is None:
-        label_Cam.after(5, camRead)
+        label_Cam.after(FRAME_DELAY_MS, camRead)
         return
 
     cvImg = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -125,7 +126,7 @@ def camRead():
     tkImage = ImageTk.PhotoImage(image=composite)
     label_Cam.photo = tkImage
     label_Cam.configure(image=tkImage)
-    label_Cam.after(5, camRead)
+    label_Cam.after(FRAME_DELAY_MS, camRead)
 
 app.bind('<Escape>', lambda e: cleanup_and_exit())
 app.bind('<KeyPress-1>', lambda e: changeImage(1))
