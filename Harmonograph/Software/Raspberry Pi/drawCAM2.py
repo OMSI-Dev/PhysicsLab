@@ -16,7 +16,7 @@ internal_width, internal_height = 1280, 720
 
 app = tk.Tk()
 
-vid = cv2.VideoCapture(0, cv2.CAP_ANY)
+vid = cv2.VideoCapture(0, cv2.CAP_GSTREAMER)
 FPS = 25.0
 FRAME_DELAY_MS = max(1, int(1000 / FPS))
 vid.set(cv2.CAP_PROP_FPS, FPS)
