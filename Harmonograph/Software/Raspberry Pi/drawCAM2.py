@@ -1,4 +1,5 @@
 import sys, os
+import time
 import cv2
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -60,6 +61,9 @@ if log_file_size > 1000:
 label_Cam = tk.Label(app)
 label_Cam.pack(fill="both", expand=True)
 
+fps_label = tk.Label(app, text="", font=("arial", 64), bg="black", fg="white")
+fps_label.place(x=50, y=50, anchor="nw")
+
 # Load mask once, resize to frame size, keep alpha
 try:
     mask_img = Image.open(mask_dir1).convert("RGBA")
@@ -103,7 +107,20 @@ def changeImage(currentMask):
         log.flush()
         mask_img = None
 
+fps_visible = False
+
+def toggle_fps(event):
+    global fps_visible
+    fps_visible = not fps_visible
+    if not fps_visible:
+        fps_label.place_forget()
+    else:
+        fps_label.place(x=50, y=50, anchor="nw")
+
 def camRead():
+    fps = 0.0
+    prev_frame_time = time.monotonic()
+
     try:
         ret, frame = vid.read()
     except Exception as e:
@@ -112,6 +129,10 @@ def camRead():
         cleanup_and_exit()
         sys.exit(1)
         return
+
+    now = time.monotonic()
+    fps = 1 / max(0.001, now - prev_frame_time)
+    prev_frame_time = now
 
     if not ret or frame is None:
         label_Cam.after(FRAME_DELAY_MS, camRead)
@@ -129,6 +150,10 @@ def camRead():
     tkImage = ImageTk.PhotoImage(image=composite)
     label_Cam.photo = tkImage
     label_Cam.configure(image=tkImage)
+
+    if fps_visible:
+        fps_label.config(text=f"FPS: {fps:.1f}")
+
     label_Cam.after(FRAME_DELAY_MS, camRead)
 
 app.bind('<Escape>', lambda e: cleanup_and_exit())
@@ -136,6 +161,7 @@ app.bind('<KeyPress-1>', lambda e: changeImage(1))
 app.bind('<KeyPress-2>', lambda e: changeImage(2))
 app.bind('<KeyPress-3>', lambda e: changeImage(3))
 app.bind('<KeyPress-4>', lambda e: changeImage(4))
+app.bind('<KeyPress-5>', toggle_fps)
 app.protocol("WM_DELETE_WINDOW", cleanup_and_exit)
 
 app.geometry("1920x1080")
