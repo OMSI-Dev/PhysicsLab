@@ -15,7 +15,7 @@ width, height = 1920, 1080
 app = tk.Tk()
 
 vid = cv2.VideoCapture(0, cv2.CAP_ANY)
-FPS = 30.0
+FPS = 15.0
 FRAME_DELAY_MS = max(1, int(1000 / FPS))
 vid.set(cv2.CAP_PROP_FPS, FPS)
 vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
