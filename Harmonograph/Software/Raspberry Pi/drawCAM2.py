@@ -1,0 +1,150 @@
+import sys, os
+import cv2
+import tkinter as tk
+from PIL import Image, ImageTk
+import datetime
+
+def get_current_dir():
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
+width, height = 1920, 1080
+display_width, display_height = 1920, 1080
+internal_width, internal_height = 1280, 720
+
+app = tk.Tk()
+
+vid = cv2.VideoCapture(0, cv2.CAP_ANY)
+FPS = 25.0
+FRAME_DELAY_MS = max(1, int(1000 / FPS))
+vid.set(cv2.CAP_PROP_FPS, FPS)
+vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+vid.set(cv2.CAP_PROP_FRAME_WIDTH, internal_width)
+vid.set(cv2.CAP_PROP_FRAME_HEIGHT, internal_height)
+
+current_dir = get_current_dir()
+log_file_path = os.path.join(current_dir, "log.txt")
+
+print(current_dir)
+print(log_file_path)
+
+log = open(log_file_path, "a")
+log.write("Start time of app: " + str(datetime.datetime.now()) + '\n')
+log.write("Camera resolution: " + str(width) + "x" + str(height) + '\n')
+log.write("Camera FPS: " + str(FPS) + '\n')
+log.flush()
+
+log_file_size = os.path.getsize(log_file_path)
+print(log_file_size)
+
+mask_dir1 = os.path.join(current_dir, "assets/images/mask1.png")
+mask_dir2 = os.path.join(current_dir, "assets/images/mask2.png")
+mask_dir3 = os.path.join(current_dir, "assets/images/mask3.png")
+mask_dir4 = os.path.join(current_dir, "assets/images/mask4.png")
+
+log.write("Mask Location:" + mask_dir1 + '\n')
+log.flush()
+
+if log_file_size > 1000:
+    log.close()
+    os.remove(log_file_path)
+    log = open(log_file_path, "a")
+    log.write("Log Cleared. Over 1000 Bytes" + '\n')
+    log.write("Start time of app: " + str(datetime.datetime.now()) + '\n')
+    log.write("Camera resolution: " + str(width) + "x" + str(height) + '\n')
+    log.write("Camera FPS: " + str(FPS) + '\n')
+    log.flush()
+
+label_Cam = tk.Label(app)
+label_Cam.pack(fill="both", expand=True)
+
+# Load mask once, resize to frame size, keep alpha
+try:
+    mask_img = Image.open(mask_dir1).convert("RGBA")
+    mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+except Exception as e:
+    log.write("Mask load error: " + str(e) + '\n')
+    log.flush()
+    mask_img = None
+
+def grab_focus():
+    app.lift()
+    app.focus_force()
+    app.grab_set()
+    app.after(100, app.focus_force)
+
+def cleanup_and_exit():
+    log.write("End time of app: " + str(datetime.datetime.now()) + '\n')
+    log.flush()
+    log.close()
+    vid.release()
+    app.destroy()
+
+def changeImage(currentMask):
+    global mask_img
+    try:
+        if currentMask == 1:
+            print("Updating Mask")
+            mask_img = Image.open(mask_dir1).convert("RGBA")
+            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+        elif currentMask == 2:
+            mask_img = Image.open(mask_dir2).convert("RGBA")
+            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+        elif currentMask == 3:
+            mask_img = Image.open(mask_dir3).convert("RGBA")
+            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+        elif currentMask == 4:
+            mask_img = Image.open(mask_dir4).convert("RGBA")
+            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+    except Exception as e:
+        log.write("Mask load error: " + str(e) + '\n')
+        log.flush()
+        mask_img = None
+
+def camRead():
+    try:
+        ret, frame = vid.read()
+    except Exception as e:
+        log.write("Exception during read: " + str(e) + '\n')
+        log.flush()
+        cleanup_and_exit()
+        sys.exit(1)
+        return
+
+    if not ret or frame is None:
+        label_Cam.after(FRAME_DELAY_MS, camRead)
+        return
+
+    cvImg = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    capImg = Image.fromarray(cvImg).convert("RGBA")
+
+    if mask_img is not None:
+        composite = Image.alpha_composite(capImg, mask_img)
+    else:
+        composite = capImg
+
+    composite = composite.resize((display_width, display_height), Image.LANCZOS)
+    tkImage = ImageTk.PhotoImage(image=composite)
+    label_Cam.photo = tkImage
+    label_Cam.configure(image=tkImage)
+    label_Cam.after(FRAME_DELAY_MS, camRead)
+
+app.bind('<Escape>', lambda e: cleanup_and_exit())
+app.bind('<KeyPress-1>', lambda e: changeImage(1))
+app.bind('<KeyPress-2>', lambda e: changeImage(2))
+app.bind('<KeyPress-3>', lambda e: changeImage(3))
+app.bind('<KeyPress-4>', lambda e: changeImage(4))
+app.protocol("WM_DELETE_WINDOW", cleanup_and_exit)
+
+app.geometry("1920x1080")
+app.overrideredirect(True)
+
+camRead()
+
+try:
+    app.after(50, grab_focus)
+    app.mainloop()
+except KeyboardInterrupt:
+    cleanup_and_exit()
