@@ -2,6 +2,7 @@ import sys, os
 import time
 import threading
 import cv2
+import numpy as np
 import tkinter as tk
 from PIL import Image, ImageTk
 import datetime
@@ -106,14 +107,25 @@ label_Cam.pack(fill="both", expand=True)
 fps_label = tk.Label(app, text="", font=("arial", 48), bg="black", fg="white")
 fps_label.place(x=50, y=50, anchor="nw")
 
-# Load mask once, resize to internal frame size, keep alpha
+# Load a mask PNG once into precomputed OpenCV blend arrays (uint16).
+# Per-frame cost is then a few NEON multiply/add passes instead of
+# Pillow's slow pure-C alpha_composite.
+def load_mask_arrays(path):
+    img = Image.open(path).convert("RGBA")
+    img = img.resize((internal_width, internal_height), Image.LANCZOS)
+    m = np.array(img)
+    rgb16 = m[:, :, :3].astype(np.uint16)
+    a = m[:, :, 3:4].astype(np.uint16)
+    a3 = np.repeat(a, 3, axis=1)
+    inv3 = (255 - a3).astype(np.uint16)
+    return rgb16, a3, inv3
+
 try:
-    mask_img = Image.open(mask_dir1).convert("RGBA")
-    mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+    mask_blend = load_mask_arrays(mask_dir1)
 except Exception as e:
     log.write("Mask load error: " + str(e) + '\n')
     log.flush()
-    mask_img = None
+    mask_blend = None
 
 def grab_focus():
     app.lift()
@@ -148,30 +160,26 @@ def cleanup_and_exit():
         pass
 
 def changeImage(currentMask):
-    global mask_img
+    global mask_blend
     try:
         if currentMask == 1:
             print("Updating Mask")
-            mask_img = Image.open(mask_dir1).convert("RGBA")
-            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+            mask_blend = load_mask_arrays(mask_dir1)
         elif currentMask == 2:
-            mask_img = Image.open(mask_dir2).convert("RGBA")
-            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+            mask_blend = load_mask_arrays(mask_dir2)
         elif currentMask == 3:
-            mask_img = Image.open(mask_dir3).convert("RGBA")
-            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+            mask_blend = load_mask_arrays(mask_dir3)
         elif currentMask == 4:
-            mask_img = Image.open(mask_dir4).convert("RGBA")
-            mask_img = mask_img.resize((internal_width, internal_height), Image.LANCZOS)
+            mask_blend = load_mask_arrays(mask_dir4)
     except Exception as e:
         log.write("Mask load error: " + str(e) + '\n')
         log.flush()
-        mask_img = None
+        mask_blend = None
 
 upsample_filters = [
-    ("NEAREST", Image.NEAREST),
-    ("BILINEAR", Image.BILINEAR),
-    ("BICUBIC", Image.BICUBIC),
+    ("NEAREST", cv2.INTER_NEAREST),
+    ("BILINEAR", cv2.INTER_LINEAR),
+    ("BICUBIC", cv2.INTER_CUBIC),
 ]
 upsample_idx = 0
 upsample_name, upsample_filter = upsample_filters[0]
@@ -199,18 +207,21 @@ def capture_worker():
         h, w = frame.shape[:2]
         if (w, h) != (internal_width, internal_height):
             frame = cv2.resize(frame, (internal_width, internal_height), interpolation=cv2.INTER_LINEAR)
-        cvImg = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        capImg = Image.fromarray(cvImg).convert("RGBA")
-        mask = mask_img
-        if mask is not None:
-            composite = Image.alpha_composite(capImg, mask)
-        else:
-            composite = capImg
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        mb = mask_blend
+        if mb is not None:
+            # Per-pixel alpha blend in uint16 fixed point (NEON-optimized):
+            # out = (frame*(255-a) + mask*a) / 255
+            mask_rgb16, a3, inv3 = mb
+            f16 = rgb.astype(np.uint16)
+            t1 = cv2.multiply(f16, inv3)
+            t2 = cv2.multiply(mask_rgb16, a3)
+            rgb = cv2.convertScaleAbs(cv2.add(t1, t2), alpha=1.0 / 255.0)
         if (display_width, display_height) != (internal_width, internal_height):
             # Filter switchable at runtime with key 6 (NEAREST is fastest)
-            composite = composite.resize((display_width, display_height), upsample_filter)
+            rgb = cv2.resize(rgb, (display_width, display_height), interpolation=upsample_filter)
         with frame_lock:
-            latest_frame["img"] = composite
+            latest_frame["img"] = rgb
             latest_frame["gen"] += 1
         render_ms["v"] = (time.monotonic() - t0) * 1000.0
         # Pace the worker to the target FPS so a faster camera does not waste CPU
@@ -252,7 +263,8 @@ def show_frame():
         gen = latest_frame["gen"]
     if img is not None and gen != last_shown_gen:
         last_shown_gen = gen
-        tkImage = ImageTk.PhotoImage(image=img)
+        # img is an RGB numpy array; PIL is only touched here, off the hot path
+        tkImage = ImageTk.PhotoImage(image=Image.fromarray(img))
         label_Cam.photo = tkImage
         label_Cam.configure(image=tkImage)
         if last_display_t is not None:
