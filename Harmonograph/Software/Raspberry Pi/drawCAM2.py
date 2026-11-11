@@ -134,6 +134,14 @@ def changeImage(currentMask):
         log.flush()
         mask_img = None
 
+upsample_filters = [
+    ("NEAREST", Image.NEAREST),
+    ("BILINEAR", Image.BILINEAR),
+    ("BICUBIC", Image.BICUBIC),
+]
+upsample_idx = 0
+upsample_name, upsample_filter = upsample_filters[0]
+
 def capture_worker():
     """Reads and processes frames off the UI thread, as fast as the camera allows.
 
@@ -165,9 +173,8 @@ def capture_worker():
         else:
             composite = capImg
         if (display_width, display_height) != (internal_width, internal_height):
-            # NEAREST is ~40x faster than LANCZOS/BILINEAR on the Pi;
-            # fine for a 1.5x upscale of live camera video.
-            composite = composite.resize((display_width, display_height), Image.NEAREST)
+            # Filter switchable at runtime with key 6 (NEAREST is fastest)
+            composite = composite.resize((display_width, display_height), upsample_filter)
         with frame_lock:
             latest_frame["img"] = composite
             latest_frame["gen"] += 1
@@ -187,6 +194,12 @@ def toggle_fps(event):
         fps_label.place_forget()
     else:
         fps_label.place(x=50, y=50, anchor="nw")
+
+def cycle_upsample(event):
+    global upsample_idx, upsample_name, upsample_filter
+    upsample_idx = (upsample_idx + 1) % len(upsample_filters)
+    upsample_name, upsample_filter = upsample_filters[upsample_idx]
+    print("Upsample filter: " + upsample_name)
 
 last_shown_gen = 0
 last_display_t = None
@@ -213,7 +226,7 @@ def show_frame():
             ema_fps = inst if ema_fps == 0.0 else ema_fps * 0.9 + inst * 0.1
         last_display_t = now
         if fps_visible:
-            fps_label.config(text=f"FPS: {ema_fps:.1f}  ({render_ms['v']:.0f} ms/frame)")
+            fps_label.config(text=f"FPS: {ema_fps:.1f}  ({render_ms['v']:.0f} ms/frame)  {upsample_name}")
     label_Cam.after(FRAME_DELAY_MS, show_frame)
 
 app.bind('<Escape>', lambda e: cleanup_and_exit())
@@ -222,6 +235,7 @@ app.bind('<KeyPress-2>', lambda e: changeImage(2))
 app.bind('<KeyPress-3>', lambda e: changeImage(3))
 app.bind('<KeyPress-4>', lambda e: changeImage(4))
 app.bind('<KeyPress-5>', toggle_fps)
+app.bind('<KeyPress-6>', cycle_upsample)
 app.protocol("WM_DELETE_WINDOW", cleanup_and_exit)
 
 app.geometry("1920x1080")
