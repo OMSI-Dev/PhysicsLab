@@ -18,13 +18,8 @@ internal_width, internal_height = 1280, 720
 
 app = tk.Tk()
 
-vid = cv2.VideoCapture(0, cv2.CAP_GSTREAMER)
 FPS = 25.0
 FRAME_DELAY_MS = max(1, int(1000 / FPS))
-vid.set(cv2.CAP_PROP_FPS, FPS)
-vid.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
-vid.set(cv2.CAP_PROP_FRAME_WIDTH, internal_width)
-vid.set(cv2.CAP_PROP_FRAME_HEIGHT, internal_height)
 
 current_dir = get_current_dir()
 log_file_path = os.path.join(current_dir, "log.txt")
@@ -34,7 +29,7 @@ print(log_file_path)
 
 log = open(log_file_path, "a")
 log.write("Start time of app: " + str(datetime.datetime.now()) + '\n')
-log.write("Camera resolution: " + str(internal_width) + "x" + str(internal_height) + " (display " + str(display_width) + "x" + str(display_height) + ")\n")
+log.write("Target resolution: " + str(internal_width) + "x" + str(internal_height) + " (display " + str(display_width) + "x" + str(display_height) + ")\n")
 log.write("Camera FPS: " + str(FPS) + '\n')
 log.write("Pipeline: threaded capture, latest-frame display\n")
 log.flush()
@@ -42,10 +37,49 @@ log.flush()
 log_file_size = os.path.getsize(log_file_path)
 print(log_file_size)
 
-if not vid.isOpened():
-    log.write("ERROR: Camera failed to open\n")
+def open_camera():
+    """Try camera backends in order until one actually delivers a frame.
+
+    GStreamer first (fast MJPG path for USB cameras), then plain V4L2,
+    then ANY with property sets, then a plain open. Each candidate is
+    verified with a real test read because isOpened() lies on some
+    backends (notably GStreamer).
+    """
+    attempts = [
+        ("GStreamer", cv2.CAP_GSTREAMER, True),
+        ("V4L2", cv2.CAP_V4L2, True),
+        ("ANY", cv2.CAP_ANY, True),
+        ("ANY plain", cv2.CAP_ANY, False),
+    ]
+    for label, backend, with_props in attempts:
+        cap = cv2.VideoCapture(0, backend)
+        if not cap.isOpened():
+            log.write("Camera " + label + ": failed to open\n")
+            log.flush()
+            cap.release()
+            continue
+        if with_props:
+            cap.set(cv2.CAP_PROP_FPS, FPS)
+            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, internal_width)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, internal_height)
+        ret, test_frame = cap.read()
+        if ret and test_frame is not None:
+            h, w = test_frame.shape[:2]
+            log.write("Camera opened via " + label + " at " + str(w) + "x" + str(h) + "\n")
+            log.flush()
+            print("Camera backend: " + label + " (" + str(w) + "x" + str(h) + ")")
+            return cap, label
+        log.write("Camera " + label + ": opened but test read failed\n")
+        log.flush()
+        cap.release()
+    return None, None
+
+vid, backend_label = open_camera()
+if vid is None:
+    log.write("ERROR: Camera failed to open on all backends\n")
     log.flush()
-    print("ERROR: Camera failed to open")
+    print("ERROR: Camera failed to open on all backends")
     sys.exit(1)
 
 mask_dir1 = os.path.join(current_dir, "assets/images/mask1.png")
@@ -62,7 +96,7 @@ if log_file_size > 1000:
     log = open(log_file_path, "a")
     log.write("Log Cleared. Over 1000 Bytes" + '\n')
     log.write("Start time of app: " + str(datetime.datetime.now()) + '\n')
-    log.write("Camera resolution: " + str(internal_width) + "x" + str(internal_height) + " (display " + str(display_width) + "x" + str(display_height) + ")\n")
+    log.write("Target resolution: " + str(internal_width) + "x" + str(internal_height) + " (display " + str(display_width) + "x" + str(display_height) + ")\n")
     log.write("Camera FPS: " + str(FPS) + '\n')
     log.flush()
 
