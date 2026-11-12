@@ -33,6 +33,7 @@ log.write("Start time of app: " + str(datetime.datetime.now()) + '\n')
 log.write("Target resolution: " + str(internal_width) + "x" + str(internal_height) + " (display " + str(display_width) + "x" + str(display_height) + ")\n")
 log.write("Camera FPS: " + str(FPS) + '\n')
 log.write("Pipeline: threaded capture, latest-frame display\n")
+log.write("OpenCV: " + cv2.__version__ + '\n')
 log.flush()
 
 log_file_size = os.path.getsize(log_file_path)
@@ -116,7 +117,7 @@ def load_mask_arrays(path):
     m = np.array(img)
     rgb16 = m[:, :, :3].astype(np.uint16)
     a = m[:, :, 3:4].astype(np.uint16)
-    a3 = np.repeat(a, 3, axis=1)
+    a3 = np.repeat(a, 3, axis=2)
     inv3 = (255 - a3).astype(np.uint16)
     return rgb16, a3, inv3
 
@@ -191,6 +192,8 @@ def capture_worker():
     are dropped instead of queueing up.
     """
     next_t = time.monotonic()
+    err_count = 0
+    last_err_log = 0.0
     while not stop_event.is_set():
         t0 = time.monotonic()
         try:
@@ -208,15 +211,25 @@ def capture_worker():
         if (w, h) != (internal_width, internal_height):
             frame = cv2.resize(frame, (internal_width, internal_height), interpolation=cv2.INTER_LINEAR)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        mb = mask_blend
-        if mb is not None:
-            # Per-pixel alpha blend in uint16 fixed point (NEON-optimized):
-            # out = (frame*(255-a) + mask*a) / 255
-            mask_rgb16, a3, inv3 = mb
-            f16 = rgb.astype(np.uint16)
-            t1 = cv2.multiply(f16, inv3)
-            t2 = cv2.multiply(mask_rgb16, a3)
-            rgb = cv2.convertScaleAbs(cv2.add(t1, t2), alpha=1.0 / 255.0)
+        try:
+            mb = mask_blend
+            if mb is not None:
+                # Per-pixel alpha blend in uint16 fixed point (NEON-optimized):
+                # out = (frame*(255-a) + mask*a) / 255
+                mask_rgb16, a3, inv3 = mb
+                f16 = rgb.astype(np.uint16)
+                t1 = cv2.multiply(f16, inv3)
+                t2 = cv2.multiply(mask_rgb16, a3)
+                rgb = cv2.convertScaleAbs(cv2.add(t1, t2), alpha=1.0 / 255.0)
+        except Exception as e:
+            # Never let a blend error kill the worker thread (silent gray
+            # screen). Fall back to the raw frame and log the error.
+            err_count += 1
+            if err_count <= 5 or time.monotonic() - last_err_log > 2.0:
+                last_err_log = time.monotonic()
+                log.write("Frame blend error (" + str(err_count) + "x): " + str(e) + '\n')
+                log.flush()
+                print("Frame blend error: " + str(e))
         if (display_width, display_height) != (internal_width, internal_height):
             # Filter switchable at runtime with key 6 (NEAREST is fastest)
             rgb = cv2.resize(rgb, (display_width, display_height), interpolation=upsample_filter)
