@@ -22,17 +22,33 @@ fi
 DEST="$HOME/.config/autostart/harmonograph-camera.desktop"
 mkdir -p "$HOME/.config/autostart"
 
+# Resolve the Python interpreter:
+#   1) explicit:    VENV=/path/to/venv ./install_autostart.sh
+#   2) activated:   run the installer from inside the venv
+#   3) local:       a 'venv/' directory next to this script
+#   4) fallback:    system python3
+if [ -n "$VENV" ] && [ -x "$VENV/bin/python3" ]; then
+    PY="$VENV/bin/python3"
+elif [ -n "$VIRTUAL_ENV" ] && [ -x "$VIRTUAL_ENV/bin/python3" ]; then
+    PY="$VIRTUAL_ENV/bin/python3"
+elif [ -x "$DIR/venv/bin/python3" ]; then
+    PY="$DIR/venv/bin/python3"
+else
+    PY="python3"
+fi
+
 # sleep 3 lets the desktop settle before the camera window grabs the screen
 cat > "$DEST" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Harmonograph Camera
 Comment=Harmonograph webcam display ($SCRIPT_NAME)
-Exec=sh -c 'sleep 3; exec env DISPLAY=:0 python3 "$TARGET"'
+Exec=sh -c 'sleep 3; exec env DISPLAY=:0 "$PY" "$TARGET"'
 Terminal=false
 X-GNOME-Autostart-enabled=true
 EOF
 chmod +x "$DEST"
 
 echo "Installed: $DEST"
-echo "It will start on the next login (or test now: env DISPLAY=:0 python3 \"$TARGET\")"
+echo "Interpreter: $PY"
+echo "It will start on the next login (or test now: env DISPLAY=:0 \"$PY\" \"$TARGET\")"
