@@ -52,3 +52,22 @@ chmod +x "$DEST"
 echo "Installed: $DEST"
 echo "Interpreter: $PY"
 echo "It will start on the next login (or test now: env DISPLAY=:0 \"$PY\" \"$TARGET\")"
+
+# Also autostart unclutter (cursor hider) if it is installed.
+if command -v unclutter >/dev/null 2>&1; then
+    UC="$HOME/.config/autostart/unclutter.desktop"
+    cat > "$UC" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Unclutter
+Comment=Hide the mouse cursor when idle
+Exec=sh -c 'sleep 4; exec env DISPLAY=:0 unclutter -idle 2'
+Terminal=false
+X-GNOME-Autostart-enabled=true
+EOF
+    chmod +x "$UC"
+    echo "Installed: $UC (cursor hides after ~2s idle, reappears on movement)"
+else
+    echo "NOTE: unclutter not found - cursor stays visible."
+    echo "      Install it with: sudo apt install unclutter, then re-run this script."
+fi
