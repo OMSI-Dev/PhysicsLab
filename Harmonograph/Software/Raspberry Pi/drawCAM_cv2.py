@@ -228,6 +228,8 @@ def capture_worker():
 win_name = "Harmonograph"
 cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
 cv2.resizeWindow(win_name, 1920, 1080)
+# Borderless fullscreen on X11 (removes the title bar via override-redirect)
+cv2.setWindowProperty(win_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 fps_visible = False
 last_shown_gen = 0
